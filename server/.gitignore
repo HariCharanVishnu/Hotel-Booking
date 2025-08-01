@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 # Dependencies
 node_modules/
-*/node_modules/
 
 # Environment files
 .env
@@ -10,16 +7,7 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
-client/.env
-server/.env
 
-# Build outputs
-dist/
-build/
-*/dist/
-*/build/
-
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)
 # Logs
 logs
 *.log
@@ -29,12 +17,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-<<<<<<< HEAD
-node_modules
-dist
-dist-ssr
-*.local
-=======
 # Runtime data
 pids
 *.pid
@@ -49,6 +31,7 @@ coverage/
 .nyc_output
 
 # Dependency directories
+node_modules/
 jspm_packages/
 
 # Optional npm cache directory
@@ -72,6 +55,10 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
+# dotenv environment variables file
+.env
+.env.test
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -94,7 +81,6 @@ public
 # Temporary folders
 tmp/
 temp/
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)
 
 # Editor directories and files
 .vscode/*
@@ -106,20 +92,6 @@ temp/
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
-=======
 
 # OS generated files
-Thumbs.db
-
-# Database files
-*.db
-*.sqlite
-
-# Uploads
-uploads/
-public/uploads/
-
-# Local development files
-*.local 
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)
+Thumbs.db 
