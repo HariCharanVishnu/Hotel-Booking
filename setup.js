@@ -1,76 +1,51 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
+const { spawn } = require('child_process');
 const path = require('path');
 
-console.log('🏨 Hotel Booking System Setup');
-console.log('=============================\n');
+console.log('🚀 Starting Hotel Booking Application...\n');
 
-// Check if .env file exists in server directory
-const serverEnvPath = path.join(__dirname, 'server', '.env');
-const serverEnvExamplePath = path.join(__dirname, 'server', 'env.example');
+// Function to start a process
+function startProcess(command, args, cwd, name) {
+  console.log(`📦 Starting ${name}...`);
+  
+  const process = spawn(command, args, {
+    cwd: path.resolve(cwd),
+    stdio: 'pipe',
+    shell: true
+  });
 
-if (!fs.existsSync(serverEnvPath)) {
-  console.log('📝 Creating server .env file...');
-  
-  if (fs.existsSync(serverEnvExamplePath)) {
-    const envContent = fs.readFileSync(serverEnvExamplePath, 'utf8');
-    fs.writeFileSync(serverEnvPath, envContent);
-    console.log('✅ Server .env file created from template');
-  } else {
-    const defaultEnvContent = `NODE_ENV=development
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/hotel-booking
-JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
-CLIENT_URL=http://localhost:5173
-STRIPE_SECRET_KEY=your_stripe_secret_key_here
-CLERK_SECRET_KEY=your_clerk_secret_key_here`;
-    
-    fs.writeFileSync(serverEnvPath, defaultEnvContent);
-    console.log('✅ Server .env file created with default values');
-  }
-  
-  console.log('⚠️  Please update the server .env file with your actual API keys and secrets\n');
-} else {
-  console.log('✅ Server .env file already exists');
+  process.stdout.on('data', (data) => {
+    console.log(`[${name}] ${data.toString().trim()}`);
+  });
+
+  process.stderr.on('data', (data) => {
+    console.error(`[${name} ERROR] ${data.toString().trim()}`);
+  });
+
+  process.on('close', (code) => {
+    console.log(`[${name}] Process exited with code ${code}`);
+  });
+
+  return process;
 }
 
-// Check if .env file exists in client directory
-const clientEnvPath = path.join(__dirname, 'client', '.env');
+// Start server
+const server = startProcess('npm', ['start'], './server', 'Server');
 
-if (!fs.existsSync(clientEnvPath)) {
-  console.log('📝 Creating client .env file...');
-  
-  const clientEnvContent = `VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here`;
-  
-  fs.writeFileSync(clientEnvPath, clientEnvContent);
-  console.log('✅ Client .env file created');
-  console.log('⚠️  Please update the client .env file with your Clerk publishable key\n');
-} else {
-  console.log('✅ Client .env file already exists');
-}
+// Wait a bit then start client
+setTimeout(() => {
+  const client = startProcess('npm', ['run', 'dev'], './client', 'Client');
+}, 2000);
 
-// Check if node_modules exist
-const serverNodeModules = path.join(__dirname, 'server', 'node_modules');
-const clientNodeModules = path.join(__dirname, 'client', 'node_modules');
+// Handle process termination
+process.on('SIGINT', () => {
+  console.log('\n🛑 Shutting down...');
+  server.kill();
+  process.exit(0);
+});
 
-if (!fs.existsSync(serverNodeModules)) {
-  console.log('📦 Server dependencies not installed. Run: cd server && npm install');
-}
-
-if (!fs.existsSync(clientNodeModules)) {
-  console.log('📦 Client dependencies not installed. Run: cd client && npm install');
-}
-
-console.log('\n🚀 Setup complete!');
-console.log('\nNext steps:');
-console.log('1. Update server/.env with your actual API keys:');
-console.log('   - JWT_SECRET (generate a secure random string)');
-console.log('   - STRIPE_SECRET_KEY (from your Stripe dashboard)');
-console.log('   - CLERK_SECRET_KEY (from your Clerk dashboard)');
-console.log('2. Update client/.env with your Clerk publishable key');
-console.log('3. Make sure MongoDB is running locally or update MONGODB_URI');
-console.log('4. Install dependencies: npm run install-all');
-console.log('5. Run "npm run dev" to start the development servers');
-console.log('6. Visit http://localhost:5173 to view the application');
-console.log('\nHappy coding! 🎉'); 
+console.log('✅ Setup complete! Check the output above for any errors.');
+console.log('🌐 Frontend: http://localhost:5173');
+console.log('🔗 Backend: http://localhost:5000');
+console.log('📊 Health Check: http://localhost:5000/api/health'); 

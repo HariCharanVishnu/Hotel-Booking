@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # Dependencies
 node_modules/
 */node_modules/
@@ -19,7 +17,6 @@ build/
 */dist/
 */build/
 
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)
 # Logs
 logs
 *.log
@@ -29,12 +26,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-<<<<<<< HEAD
-node_modules
-dist
-dist-ssr
-*.local
-=======
 # Runtime data
 pids
 *.pid
@@ -94,7 +85,6 @@ public
 # Temporary folders
 tmp/
 temp/
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)
 
 # Editor directories and files
 .vscode/*
@@ -106,8 +96,6 @@ temp/
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
-=======
 
 # OS generated files
 Thumbs.db
@@ -122,4 +110,3 @@ public/uploads/
 
 # Local development files
 *.local 
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)

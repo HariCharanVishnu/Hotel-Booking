@@ -1,53 +1,17 @@
 {
-<<<<<<< HEAD
-  "name": "client",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@clerk/clerk-react": "^5.38.0",
-    "@tailwindcss/vite": "^4.1.11",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.7.1",
-    "tailwindcss": "^4.1.11"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.30.1",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
-    "eslint": "^9.30.1",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.3.0",
-    "vite": "^7.0.4"
-  }
-}
-=======
   "name": "hotel-booking",
   "version": "1.0.0",
-  "description": "A complete hotel booking system",
-  "main": "server/index.js",
+  "description": "Hotel Booking System with React Frontend and Node.js Backend",
+  "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && npm run dev",
-    "client": "cd client && npm run dev",
-    "build": "cd client && npm run build",
+    "dev": "node setup.js",
+    "dev:server": "cd server && npm start",
+    "dev:client": "cd client && npm run dev",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "setup": "node setup.js"
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
   },
-  "keywords": ["hotel", "booking", "react", "nodejs"],
+  "keywords": ["hotel", "booking", "react", "nodejs", "mongodb"],
   "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
-} 
->>>>>>> 13eeb00 (Initial commit: Hotel Booking System with fixes and improvements)
+  "license": "ISC"
+}

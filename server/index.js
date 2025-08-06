@@ -47,12 +47,33 @@ app.use('/api/users', userRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Hotel Booking API is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Hotel Booking API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Hotel Booking API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      hotels: '/api/hotels',
+      rooms: '/api/rooms',
+      bookings: '/api/bookings',
+      users: '/api/users'
+    }
+  });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ Server Error:', err.stack);
   res.status(500).json({ 
     success: false, 
     message: 'Something went wrong!',
@@ -62,9 +83,15 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
+  res.status(404).json({ 
+    success: false, 
+    message: 'Route not found',
+    path: req.originalUrl
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📱 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
 }); 
