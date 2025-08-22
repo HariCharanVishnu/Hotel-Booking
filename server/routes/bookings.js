@@ -1,11 +1,12 @@
 import express from 'express';
 import Booking from '../models/Booking.js';
 import Room from '../models/Room.js';
+import Hotel from '../models/Hotel.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// @desc    Create booking
+// @desc    Create booking with real-time updates
 // @route   POST /api/bookings
 // @access  Private
 router.post('/', protect, async (req, res) => {
@@ -61,6 +62,41 @@ router.post('/', protect, async (req, res) => {
       .populate('room', 'roomType pricePerNight images')
       .populate('hotel', 'name address city')
       .populate('user', 'username email');
+
+    // Get Socket.IO instance for real-time updates
+    const io = req.app.get('io');
+    if (io) {
+      // Notify hotel owner about new booking
+      io.to(`hotel-${room.hotel}`).emit('new-booking', {
+        bookingId: booking._id,
+        hotelId: room.hotel,
+        userId: req.user._id,
+        roomType: room.roomType,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        guests,
+        totalPrice,
+        status: 'pending',
+        timestamp: new Date().toISOString()
+      });
+
+      // Notify user about booking confirmation
+      io.to(`user-${req.user._id}`).emit('booking-created', {
+        bookingId: booking._id,
+        status: 'pending',
+        message: 'Your booking has been created successfully!',
+        timestamp: new Date().toISOString()
+      });
+
+      // Emit general booking update
+      io.emit('booking-update', {
+        type: 'created',
+        bookingId: booking._id,
+        hotelId: room.hotel,
+        userId: req.user._id,
+        timestamp: new Date().toISOString()
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -220,6 +256,77 @@ router.get('/hotel/:hotelId', protect, authorize('hotelOwner', 'admin'), async (
       data: bookings
     });
   } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// @desc    Get real-time booking statistics
+// @route   GET /api/bookings/stats/real-time
+// @access  Private
+router.get('/stats/real-time', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const userRole = req.user.role;
+
+    let stats = {};
+
+    if (userRole === 'hotelOwner') {
+      // Get hotel owner stats
+      const hotels = await Hotel.find({ owner: userId });
+      const hotelIds = hotels.map(hotel => hotel._id);
+
+      const totalBookings = await Booking.countDocuments({ hotel: { $in: hotelIds } });
+      const pendingBookings = await Booking.countDocuments({ 
+        hotel: { $in: hotelIds }, 
+        status: 'pending' 
+      });
+      const confirmedBookings = await Booking.countDocuments({ 
+        hotel: { $in: hotelIds }, 
+        status: 'confirmed' 
+      });
+      const completedBookings = await Booking.countDocuments({ 
+        hotel: { $in: hotelIds }, 
+        status: 'completed' 
+      });
+
+      stats = {
+        totalBookings,
+        pendingBookings,
+        confirmedBookings,
+        completedBookings,
+        totalHotels: hotels.length
+      };
+    } else {
+      // Get regular user stats
+      const totalBookings = await Booking.countDocuments({ user: userId });
+      const upcomingBookings = await Booking.countDocuments({ 
+        user: userId, 
+        status: 'confirmed',
+        checkInDate: { $gte: new Date() }
+      });
+      const completedBookings = await Booking.countDocuments({ 
+        user: userId, 
+        status: 'completed' 
+      });
+      const cancelledBookings = await Booking.countDocuments({ 
+        user: userId, 
+        status: 'cancelled' 
+      });
+
+      stats = {
+        totalBookings,
+        upcomingBookings,
+        completedBookings,
+        cancelledBookings
+      };
+    }
+
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Error fetching booking stats:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
